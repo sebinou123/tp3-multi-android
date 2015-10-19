@@ -1,0 +1,20 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+    </style>
+    <style name="CustomText" >
+        <item name="android:textSize">@dimen/text_dim</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+    <style name="CustomButton" >
+        <item name="android:background">@color/purple</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+    <style name="CustomSurface" >
+        <item name="android:background">@color/lightPurple</item>
+    </style>
+
+</resources>
