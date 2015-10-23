@@ -1,12 +1,15 @@
 <resources>
     <string name="app_name">Collision Ball</string>
     <string name="action_settings">Settings</string>
-    <string name="nbParticleLabel">Particles :</string>
-    <string name="nbParticle"></string>
-    <string name="speedLabel">Vitesse : </string>
-    <string name="angleLabel">Angle : </string>
-    <string name="radiusLabel">Rayon : </string>
-    <string name="colorLabel">Couleur : </string>
+    <string name="nbParticleLabel">Particles</string>
+    <string name="nbParticle">0</string>
+    <string name="progressSpeed">0</string>
+    <string name="progressAngle">0</string>
+    <string name="progressRadius">0</string>
+    <string name="speedLabel">Vitesse</string>
+    <string name="angleLabel">Angle</string>
+    <string name="radiusLabel">Rayon</string>
+    <string name="colorLabel">Couleur</string>
     <string name="generateButton">Générer</string>
     <string name="resetButton">Réinitialiser</string>
     <string name="exitButton">Quitter</string>

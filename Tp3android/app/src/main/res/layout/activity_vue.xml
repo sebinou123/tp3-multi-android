@@ -11,24 +11,27 @@
         android:layout_height="match_parent"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
-        android:weightSum="1">
+        android:weightSum="100">
 
         <SurfaceView
             style="@style/CustomSurface"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            android:layout_weight="60"
+            android:layout_height="50dp"
             android:id="@+id/surfaceView"
             android:layout_gravity="center_horizontal"
-            android:layout_weight="0.56"
             android:padding="3px" />
+
 
         <LinearLayout
             android:orientation="horizontal"
+            android:layout_weight="30"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:layout_gravity="center_horizontal"
-            android:layout_weight="0.22"
-            android:weightSum="1">
+            android:paddingTop="10dp"
+            android:paddingBottom="20dp">
+
 
             <LinearLayout
                 android:orientation="vertical"
@@ -38,15 +41,16 @@
 
                 <TextView
                     style="@style/CustomText"
-                    android:layout_width="wrap_content"
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:text="@string/nbParticleLabel"
+                    android:layout_gravity="center_horizontal"
                     android:id="@+id/nbParticleLabel" />
 
                 <TextView
                     style="@style/CustomText"
-                    android:layout_width="wrap_content"
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:text="@string/nbParticle"
@@ -61,17 +65,27 @@
 
                 <TextView
                     style="@style/CustomText"
-                    android:layout_width="wrap_content"
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:layout_gravity="center_horizontal"
                     android:text="@string/speedLabel"
                     android:id="@+id/speedLabel" />
 
-                <ProgressBar
-                    style="?android:attr/progressBarStyleSmall"
-                    android:layout_width="wrap_content"
+                <SeekBar
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/speedBar" />
+                    android:id="@+id/speedSlider"
+                    android:progress="0"
+                    android:max="10" />
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="@string/progressSpeed"
+                    android:id="@+id/progressSpeed" />
+
             </LinearLayout>
 
             <LinearLayout
@@ -82,17 +96,27 @@
 
                 <TextView
                     style="@style/CustomText"
-                    android:layout_width="wrap_content"
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:text="@string/angleLabel"
                     android:id="@+id/angleLabel" />
 
-                <ProgressBar
-                    style="?android:attr/progressBarStyleSmall"
-                    android:layout_width="wrap_content"
+                <SeekBar
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/angleBar" />
+                    android:id="@+id/angleSlider"
+                    android:max="360"
+                    android:progress="0" />
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="@string/progressAngle"
+                    android:id="@+id/progressAngle" />
+
             </LinearLayout>
 
             <LinearLayout
@@ -103,28 +127,40 @@
 
                 <TextView
                     style="@style/CustomText"
-                    android:layout_width="wrap_content"
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:text="@string/radiusLabel"
                     android:id="@+id/radiusLabel" />
 
-                <ProgressBar
-                    style="?android:attr/progressBarStyleSmall"
-                    android:layout_width="wrap_content"
+                <SeekBar
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/radiusBar" />
+                    android:id="@+id/radiusSlider"
+                    android:max="6"
+                    android:progress="0" />
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="@string/progressRadius"
+                    android:id="@+id/progressRadius" />
+
             </LinearLayout>
 
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:layout_weight="0.11">
 
                 <TextView
                     style="@style/CustomText"
-                    android:layout_width="wrap_content"
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:text="@string/colorLabel"
                     android:id="@+id/colorLabel" />
@@ -135,8 +171,11 @@
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal">
+            android:layout_height="60dp"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:layout_weight="5">
 
 
             <Button
