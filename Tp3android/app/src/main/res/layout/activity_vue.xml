@@ -14,7 +14,6 @@
         android:weightSum="100">
 
         <SurfaceView
-            style="@style/CustomSurface"
             android:layout_width="fill_parent"
             android:layout_weight="60"
             android:layout_height="50dp"
