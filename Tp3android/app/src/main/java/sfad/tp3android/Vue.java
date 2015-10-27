@@ -80,11 +80,12 @@ public class Vue extends AppCompatActivity {
         initialize = (Button) findViewById(R.id.resetButton);
         exit = (Button) findViewById(R.id.exitButton);
 
+        clickSurface touchListener = new clickSurface();
         pane = (SurfaceView) findViewById(R.id.surfaceView);
-        pane.setOnTouchListener(new clickSurface());
-        generate.setOnTouchListener(new clickSurface());
-        initialize.setOnTouchListener(new clickSurface());
-        exit.setOnTouchListener(new clickSurface());
+        pane.setOnTouchListener(touchListener);
+        generate.setOnTouchListener(touchListener);
+        initialize.setOnTouchListener(touchListener);
+        exit.setOnTouchListener(touchListener);
         thread = new Thread(new MovementService());
 
         spnColor = (Spinner) findViewById(R.id.spnColor);
@@ -92,22 +93,6 @@ public class Vue extends AppCompatActivity {
                 R.array.color_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spnColor.setAdapter(adapter);
-
-       /* ArrayAdapter<String> myAdapter=new
-                ArrayAdapter<String>(
-                this,
-                android.R.layout.simple_list_item_1,
-                myStringArray);
-        listColor.setAdapter(myAdapter);
-        listColor.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent,
-                                    View view, int position, long id) {
-                positionList =  position;
-            }
-        });*/
-
     }
 
     private class seekBarChanger implements SeekBar.OnSeekBarChangeListener {
@@ -141,19 +126,21 @@ public class Vue extends AppCompatActivity {
 
         @Override
         public boolean onTouch(View v, MotionEvent m) {
-            if (v.getId() == generate.getId()){
-                ajouterparticle(Math.floor(Math.random() * pane.getWidth()), Math.floor(Math.random() * pane.getHeight()),
-                        Math.floor(Math.random() * seekBarAngle.getMax()), Math.floor(Math.random() * seekBarSpeed.getMax()),
-                        Math.floor(Math.random() * (seekBarRadius.getMax() - Vue.MIN_RADIUS) + Vue.MIN_RADIUS));
-            }else if(v.getId() == initialize.getId()){
-                reset();
-            } else if (v.getId() == exit.getId()) {
-                System.exit(0);
-            }else{
-                ajouterparticle((double) m.getX(), (double) m.getY(), Double.parseDouble(textprogressAngle.getText().toString()), Double.parseDouble
-                        (textprogressSpeed.getText().toString()), Double.parseDouble(textprogressRadius.getText().toString()));
+            if (m.getAction() == MotionEvent.ACTION_DOWN) {
+                if (v.getId() == generate.getId()) {
+                    Log.d("ASD", "generate");
+                    ajouterparticle(Math.floor(Math.random() * pane.getWidth()), Math.floor(Math.random() * pane.getHeight()),
+                            Math.floor(Math.random() * seekBarAngle.getMax()), Math.floor(Math.random() * seekBarSpeed.getMax()),
+                            Math.floor(Math.random() * (seekBarRadius.getMax() - Vue.MIN_RADIUS) + Vue.MIN_RADIUS));
+                } else if (v.getId() == initialize.getId()) {
+                    reset();
+                } else if (v.getId() == exit.getId()) {
+                    System.exit(0);
+                } else {
+                    ajouterparticle((double) m.getX(), (double) m.getY(), Double.parseDouble(textprogressAngle.getText().toString()), Double.parseDouble
+                            (textprogressSpeed.getText().toString()), Double.parseDouble(textprogressRadius.getText().toString()));
+                }
             }
-
             return true;
         }
     }
@@ -168,7 +155,6 @@ public class Vue extends AppCompatActivity {
         x = Particle.validatePosition(x, radius, pane.getWidth());
         y = Particle.validatePosition(y, radius, pane.getHeight());
         Particle part = new Particle(x, y, angle, speed, radius, getColor());
-        Log.d("ASD", ""+getColor());
         // Checks if the position currently has a particle in it
         for(Particle cp : objectList){
             if(cp.isColliding(part)){
@@ -183,7 +169,7 @@ public class Vue extends AppCompatActivity {
         }
     }
 
-    //TODO dessine les formes mais glitch sur bouton generate (genere 2 cercle), probleme color
+    //TODO dessine les formes mais glitch sur bouton generate (genere 2 cercle)
     private void dessin() {
         canvas = null;
         surface = pane.getHolder();
@@ -229,7 +215,6 @@ public class Vue extends AppCompatActivity {
         objectList = new ArrayList<Particle>();
         thread = new Thread(new MovementService());
         canvas = null;
-        paint.setStyle(Paint.Style.FILL);
         surface = pane.getHolder();
         canvas = surface.lockCanvas(null);
         canvas.drawColor(Color.BLACK);
