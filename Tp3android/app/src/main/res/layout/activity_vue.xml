@@ -163,6 +163,11 @@
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:text="@string/colorLabel"
                     android:id="@+id/colorLabel" />
+
+                <ListView
+                    android:layout_width="70dp"
+                    android:layout_height="fill_parent"
+                    android:id="@+id/listView" />
             </LinearLayout>
 
         </LinearLayout>

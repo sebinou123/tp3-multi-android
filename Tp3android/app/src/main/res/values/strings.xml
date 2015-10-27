@@ -5,7 +5,7 @@
     <string name="nbParticle">0</string>
     <string name="progressSpeed">0</string>
     <string name="progressAngle">0</string>
-    <string name="progressRadius">0</string>
+    <string name="progressRadius">4</string>
     <string name="speedLabel">Vitesse</string>
     <string name="angleLabel">Angle</string>
     <string name="radiusLabel">Rayon</string>

@@ -1,5 +1,6 @@
 package sfad.tp3android;
 
+import android.app.usage.UsageEvents;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -12,11 +13,18 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import java.security.Provider;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ThreadPoolExecutor;
 
 public class Vue extends AppCompatActivity {
 
@@ -25,6 +33,9 @@ public class Vue extends AppCompatActivity {
     public SeekBar seekBarSpeed;
     public SeekBar seekBarAngle;
     public SeekBar seekBarRadius;
+
+    private String[] myStringArray={"BLUE","RED","YELLOW","GREEN"};
+    public ListView listColor;
 
     public TextView textprogressSpeed;
     public TextView textprogressRadius;
@@ -42,6 +53,11 @@ public class Vue extends AppCompatActivity {
 
    public ArrayList<Particle> objectList = new ArrayList<>();
 
+    public Thread thread;
+    public boolean start = false;
+
+
+    private int positionList;
 
 
 
@@ -55,6 +71,8 @@ public class Vue extends AppCompatActivity {
         seekBarSpeed = (SeekBar) findViewById(R.id.speedSlider);
         seekBarAngle = (SeekBar) findViewById(R.id.angleSlider);
         seekBarRadius = (SeekBar) findViewById(R.id.radiusSlider);
+
+        listColor = (ListView) findViewById(R.id.listView);
 
         textprogressSpeed = (TextView) findViewById(R.id.progressSpeed);
         textprogressRadius = (TextView) findViewById(R.id.progressRadius);
@@ -74,6 +92,25 @@ public class Vue extends AppCompatActivity {
         generate.setOnTouchListener(new clickSurface());
         initialize.setOnTouchListener(new clickSurface());
         exit.setOnTouchListener(new clickSurface());
+        thread = new Thread(new MovementService());
+
+        positionList = 0;
+
+        ArrayAdapter<String> myAdapter=new
+                ArrayAdapter<String>(
+                this,
+                android.R.layout.simple_list_item_1,
+                myStringArray);
+        listColor.setAdapter(myAdapter);
+        listColor.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent,
+                                    View view, int position, long id) {
+                positionList =  position;
+
+            }
+        });
 
     }
 
@@ -109,8 +146,8 @@ public class Vue extends AppCompatActivity {
         @Override
         public boolean onTouch(View v, MotionEvent m) {
             if (v.getId() == generate.getId()){
-                dessin(Math.floor(Math.random()*pane.getWidth()), Math.floor(Math.random()*pane.getHeight()),
-                        Math.floor(Math.random()*seekBarAngle.getMax()), Math.floor(Math.random()*seekBarSpeed.getMax()),
+                ajouterparticle(Math.floor(Math.random() * pane.getWidth()), Math.floor(Math.random() * pane.getHeight()),
+                        Math.floor(Math.random() * seekBarAngle.getMax()), Math.floor(Math.random() * seekBarSpeed.getMax()),
                         Math.floor(Math.random() * (seekBarRadius.getMax() - Vue.MIN_RADIUS) + Vue.MIN_RADIUS));
 
             }
@@ -120,16 +157,21 @@ public class Vue extends AppCompatActivity {
                 System.exit(0);
             }
             else{
-                dessin((double) m.getX(),(double) m.getY(),Double.parseDouble(textprogressAngle.getText().toString()),Double.parseDouble
-                        (textprogressSpeed.getText().toString()),Double.parseDouble(textprogressRadius.getText().toString()));
+                ajouterparticle((double) m.getX(), (double) m.getY(), Double.parseDouble(textprogressAngle.getText().toString()), Double.parseDouble
+                        (textprogressSpeed.getText().toString()), Double.parseDouble(textprogressRadius.getText().toString()));
             }
 
             return true;
         }
     }
 
-    //TODO dessine les formes mais glitch, probleme set nb particle
-    private void dessin(double x, double y, double angle, double speed, double radius) {
+    private void ajouterparticle(double x, double y, double angle, double speed, double radius)
+    {
+        if(start == false)
+        {
+            thread.start();
+            start = true;
+        }
         boolean valid = true;
         x = Particle.validatePosition(x, radius, pane.getWidth());
         y = Particle.validatePosition(y, radius, pane.getHeight());
@@ -143,29 +185,63 @@ public class Vue extends AppCompatActivity {
         }
         if(valid){
             objectList.add(part);
-            canvas = null;
+            textnbParticle.setText(String.valueOf(Integer.parseInt(textnbParticle.getText().toString()) + 1));
+            dessin();
+        }
+    }
+
+    //TODO dessine les formes mais glitch sur bouton generate (genere 2 cercle), probleme color
+    private void dessin() {
+        canvas = null;
         surface = pane.getHolder();
         paint = new Paint();
         paint.setStyle(Paint.Style.FILL);
-
+        //int color = getColor();
         canvas = surface.lockCanvas(null);
 
 
-        synchronized (surface){
+            synchronized (surface) {
+                canvas.drawColor(Color.BLACK);
             paint.setColor(Color.WHITE);
-            canvas.drawCircle((float) x, (float) y, (float) radius, paint);
-          //  textnbParticle.setText(Integer.parseInt(textnbParticle.getText().toString()) + 1);
+            for(Particle cp : objectList){
+            canvas.drawCircle((float) cp.getX(), (float) cp.getY(), (float) cp.getRadius(), paint);
+            }
         }
         surface.unlockCanvasAndPost(canvas);
 
         }
+
+    private int getColor() {
+        int color;
+        if(listColor.getSelectedItem().toString() == "BLUE")
+        {
+            color = Color.BLUE;
+        }else if(listColor.getSelectedItem().toString() == "RED"){
+            color = Color.RED;
+        }else if(listColor.getSelectedItem().toString() == "GREEN"){
+            color = Color.GREEN;
+        }else{
+            color = Color.YELLOW;
+        }
+        return color;
     }
 
-    //TODO probleme reset le pane
+
     private void reset() {
-      //  textnbParticle.setText(0);
-        objectList = new ArrayList<>();
-      //  canvas.drawColor(Color.BLACK);
+        positionList = 0;
+        textnbParticle.setText(String.valueOf(0));
+        objectList = new ArrayList<Particle>();
+        thread = new Thread(new MovementService());
+        canvas = null;
+        paint.setStyle(Paint.Style.FILL);
+        surface = pane.getHolder();
+        canvas = surface.lockCanvas(null);
+        canvas.drawColor(Color.BLACK);
+        surface.unlockCanvasAndPost(canvas);
+        seekBarRadius.setProgress(0);
+        seekBarSpeed.setProgress(0);
+        seekBarAngle.setProgress(0);
+        start = false;
     }
 
         @Override
@@ -190,6 +266,80 @@ public class Vue extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
+
+    private class MovementService implements Runnable {
+        private final static long SLEEP_TIME = 2;
+        boolean running;
+
+        @Override
+        public void run() {
+            running = true;
+            while(running){
+
+                Particle currentParticle;
+                ArrayList<Particle> currentParticles = new ArrayList<>();
+                currentParticles.addAll(objectList);
+
+                for(Particle cp : currentParticles){
+                    if(running){
+                        currentParticle = cp;
+                        double oldX = currentParticle.getX();
+                        double oldY = currentParticle.getY();
+                        currentParticle.move(SLEEP_TIME);
+                        if(currentParticle.getX() >= pane.getWidth()){
+                            currentParticle.setX(pane.getWidth()-currentParticle.getRadius());
+                        }else if(currentParticle.getX() < 0){
+                            currentParticle.setX(currentParticle.getRadius());
+                        }else if(currentParticle.getY() >= pane.getHeight()){
+                            currentParticle.setY(pane.getHeight()-currentParticle.getRadius());
+                        }else if(currentParticle.getY() < 0){
+                            currentParticle.setY(currentParticle.getRadius());
+                        }
+
+                        dessin();
+
+                        if(collideParticle(currentParticle)){
+                        }
+                    }
+                }
+
+                try{
+                    Thread.sleep(SLEEP_TIME);
+                }catch(Exception e){
+                    break;
+                }
+            }
+        }
+    }
+
+
+    public boolean collideParticle(Particle p){
+        Particle currentParticle;
+        Movement movement = p.getMovement();
+        boolean returnValue = false;
+        // Circle colliding wall
+        // Right wall collision
+        if(p.getX() + p.getRadius() >= pane.getWidth() || p.getX() - p.getRadius() < 0){
+            movement.setXMovement(-movement.getXMovement());
+            returnValue = true;
+        } else if(p.getY() - p.getRadius() < 0 || p.getY() + p.getRadius() >= pane.getHeight()){
+            movement.setYMovement(-movement.getYMovement());
+            returnValue = true;
+        }
+
+        // Circles colliding other circles
+        for(Particle cp : objectList){
+            currentParticle = cp;
+            if(!currentParticle.equals(p)){
+                if(p.isColliding(currentParticle)){
+                    p.collide(currentParticle);
+                }
+            }
+        }
+
+        return returnValue;
+    }
 }
 
 
