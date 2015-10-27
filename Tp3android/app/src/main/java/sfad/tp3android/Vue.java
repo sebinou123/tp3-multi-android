@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.drawable.shapes.Shape;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -18,6 +19,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.security.Provider;
@@ -34,13 +36,12 @@ public class Vue extends AppCompatActivity {
     public SeekBar seekBarAngle;
     public SeekBar seekBarRadius;
 
-    private String[] myStringArray={"BLUE","RED","YELLOW","GREEN"};
-    public ListView listColor;
-
     public TextView textprogressSpeed;
     public TextView textprogressRadius;
     public TextView textprogressAngle;
     public TextView textnbParticle;
+
+    public Spinner spnColor;
 
     public SurfaceView pane;
     public SurfaceHolder surface;
@@ -51,16 +52,10 @@ public class Vue extends AppCompatActivity {
     public Button initialize;
     public Button exit;
 
-   public ArrayList<Particle> objectList = new ArrayList<>();
+    public ArrayList<Particle> objectList = new ArrayList<>();
 
     public Thread thread;
     public boolean start = false;
-
-
-    private int positionList;
-
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,8 +66,6 @@ public class Vue extends AppCompatActivity {
         seekBarSpeed = (SeekBar) findViewById(R.id.speedSlider);
         seekBarAngle = (SeekBar) findViewById(R.id.angleSlider);
         seekBarRadius = (SeekBar) findViewById(R.id.radiusSlider);
-
-        listColor = (ListView) findViewById(R.id.listView);
 
         textprogressSpeed = (TextView) findViewById(R.id.progressSpeed);
         textprogressRadius = (TextView) findViewById(R.id.progressRadius);
@@ -94,9 +87,13 @@ public class Vue extends AppCompatActivity {
         exit.setOnTouchListener(new clickSurface());
         thread = new Thread(new MovementService());
 
-        positionList = 0;
+        spnColor = (Spinner) findViewById(R.id.spnColor);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.color_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spnColor.setAdapter(adapter);
 
-        ArrayAdapter<String> myAdapter=new
+       /* ArrayAdapter<String> myAdapter=new
                 ArrayAdapter<String>(
                 this,
                 android.R.layout.simple_list_item_1,
@@ -108,9 +105,8 @@ public class Vue extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent,
                                     View view, int position, long id) {
                 positionList =  position;
-
             }
-        });
+        });*/
 
     }
 
@@ -149,14 +145,11 @@ public class Vue extends AppCompatActivity {
                 ajouterparticle(Math.floor(Math.random() * pane.getWidth()), Math.floor(Math.random() * pane.getHeight()),
                         Math.floor(Math.random() * seekBarAngle.getMax()), Math.floor(Math.random() * seekBarSpeed.getMax()),
                         Math.floor(Math.random() * (seekBarRadius.getMax() - Vue.MIN_RADIUS) + Vue.MIN_RADIUS));
-
-            }
-            else if(v.getId() == initialize.getId()){
+            }else if(v.getId() == initialize.getId()){
                 reset();
             } else if (v.getId() == exit.getId()) {
                 System.exit(0);
-            }
-            else{
+            }else{
                 ajouterparticle((double) m.getX(), (double) m.getY(), Double.parseDouble(textprogressAngle.getText().toString()), Double.parseDouble
                         (textprogressSpeed.getText().toString()), Double.parseDouble(textprogressRadius.getText().toString()));
             }
@@ -167,15 +160,15 @@ public class Vue extends AppCompatActivity {
 
     private void ajouterparticle(double x, double y, double angle, double speed, double radius)
     {
-        if(start == false)
-        {
+        if(start == false){
             thread.start();
             start = true;
         }
         boolean valid = true;
         x = Particle.validatePosition(x, radius, pane.getWidth());
         y = Particle.validatePosition(y, radius, pane.getHeight());
-        Particle part = new Particle(x, y, angle, speed, radius);
+        Particle part = new Particle(x, y, angle, speed, radius, getColor());
+        Log.d("ASD", ""+getColor());
         // Checks if the position currently has a particle in it
         for(Particle cp : objectList){
             if(cp.isColliding(part)){
@@ -196,39 +189,42 @@ public class Vue extends AppCompatActivity {
         surface = pane.getHolder();
         paint = new Paint();
         paint.setStyle(Paint.Style.FILL);
-        //int color = getColor();
         canvas = surface.lockCanvas(null);
-
-
-            synchronized (surface) {
-                canvas.drawColor(Color.BLACK);
-            paint.setColor(Color.WHITE);
+        synchronized (surface) {
+            canvas.drawColor(Color.BLACK);
             for(Particle cp : objectList){
-            canvas.drawCircle((float) cp.getX(), (float) cp.getY(), (float) cp.getRadius(), paint);
+                paint.setColor(cp.getColor());
+                canvas.drawCircle((float) cp.getX(), (float) cp.getY(), (float) cp.getRadius(), paint);
             }
         }
         surface.unlockCanvasAndPost(canvas);
-
-        }
+    }
 
     private int getColor() {
-        int color;
-        if(listColor.getSelectedItem().toString() == "BLUE")
-        {
-            color = Color.BLUE;
-        }else if(listColor.getSelectedItem().toString() == "RED"){
-            color = Color.RED;
-        }else if(listColor.getSelectedItem().toString() == "GREEN"){
-            color = Color.GREEN;
-        }else{
-            color = Color.YELLOW;
+        int color = Color.WHITE;
+        switch(spnColor.getSelectedItem().toString()){
+            case("Green"):
+                color = Color.GREEN;
+                break;
+            case("Blue"):
+                color = Color.BLUE;
+                break;
+            case("Yellow"):
+                color = Color.YELLOW;
+                break;
+            case("Red"):
+                color = Color.RED;
+                break;
+            case("Magenta"):
+                color = Color.MAGENTA;
+                break;
         }
         return color;
     }
 
 
     private void reset() {
-        positionList = 0;
+        spnColor.setSelection(0);
         textnbParticle.setText(String.valueOf(0));
         objectList = new ArrayList<Particle>();
         thread = new Thread(new MovementService());
@@ -276,7 +272,6 @@ public class Vue extends AppCompatActivity {
         public void run() {
             running = true;
             while(running){
-
                 Particle currentParticle;
                 ArrayList<Particle> currentParticles = new ArrayList<>();
                 currentParticles.addAll(objectList);
@@ -312,7 +307,6 @@ public class Vue extends AppCompatActivity {
             }
         }
     }
-
 
     public boolean collideParticle(Particle p){
         Particle currentParticle;

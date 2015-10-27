@@ -1,5 +1,7 @@
 package sfad.tp3android;
 
+import android.graphics.Color;
+
 /**
  *
  */
@@ -11,8 +13,6 @@ public class Particle{
     public static final double DEFAULT_SPEED = 0;
     public static final double DEFAULT_ANGLE = 0;
     public static final double DEFAULT_RADIUS = 4;
-    public static final double DEFAULT_X_MOVEMENT = 1;
-    public static final double DEFAULT_Y_MOVEMENT = 0;
 
     public static final double MAX_ANGLE_VALUE = 360;
     public static final double MIN_ANGLE_VALUE = 0;
@@ -29,6 +29,7 @@ public class Particle{
     private Movement movement;
     private double speed;
     private double angle;
+    private int color;
     /**
      * Constructor using default values
      */
@@ -39,15 +40,17 @@ public class Particle{
         this.setAngle(Particle.DEFAULT_ANGLE);
         this.setMovement(new Movement(Particle.DEFAULT_SPEED));
         this.setRadius(Particle.DEFAULT_RADIUS);
+        this.setColor(Color.WHITE);
     }
 
-    public Particle(double x, double y, double a, double s, double r){
+    public Particle(double x, double y, double a, double s, double r, int color){
         this.x = x;
         this.y = y;
         this.radius = r;
         this.speed = s;
         this.angle = a;
         this.movement = new Movement(Math.cos(Math.toRadians(angle)), Math.sin(Math.toRadians(angle)), s);
+        this.setColor(color);
     }
 
     /**
@@ -176,6 +179,14 @@ public class Particle{
     }
 
     /**
+     * Sets the color for the particle
+     * @param color color
+     */
+    public void setColor(int color){
+        this.color = color;
+    }
+
+    /**
      * Sets a Movement class for the particle
      */
     private void setMovement(Movement movement){
@@ -188,6 +199,15 @@ public class Particle{
      */
     public double getX(){
         return this.x;
+    }
+
+
+    /**
+     * Gets the color for the particle
+     * @return color color
+     */
+    public int getColor(){
+        return this.color;
     }
 
     /**
