@@ -1,10 +1,8 @@
 package sfad.tp3android;
 
-import android.app.usage.UsageEvents;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.drawable.shapes.Shape;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,24 +12,19 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import java.security.Provider;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ThreadPoolExecutor;
 
+/**
+ * Class controleur who draw particle on a surfaceview with different radius, angle, speed, who handle collision between particle
+ */
 public class Vue extends AppCompatActivity {
-
-    private static final int MIN_RADIUS = 4;
-
     public SeekBar seekBarSpeed;
     public SeekBar seekBarAngle;
     public SeekBar seekBarRadius;
@@ -52,16 +45,24 @@ public class Vue extends AppCompatActivity {
     public Button initialize;
     public Button exit;
 
-    public ArrayList<Particle> objectList = new ArrayList<>();
+    public ArrayList<Particle> objectList;
 
     public Thread thread;
     public boolean start = false;
 
+    /**
+     * Initialize all the compont of the application and add listener to all button and the surface view
+     *
+     * @param savedInstanceState - instance
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_vue);
         objectList = new ArrayList<>();
+
+        paint = new Paint();
+        paint.setStyle(Paint.Style.FILL);
 
         seekBarSpeed = (SeekBar) findViewById(R.id.speedSlider);
         seekBarAngle = (SeekBar) findViewById(R.id.angleSlider);
@@ -82,6 +83,7 @@ public class Vue extends AppCompatActivity {
 
         clickSurface touchListener = new clickSurface();
         pane = (SurfaceView) findViewById(R.id.surfaceView);
+        surface = pane.getHolder();
         pane.setOnTouchListener(touchListener);
         generate.setOnTouchListener(touchListener);
         initialize.setOnTouchListener(touchListener);
@@ -95,8 +97,18 @@ public class Vue extends AppCompatActivity {
         spnColor.setAdapter(adapter);
     }
 
+    /**
+     * Class who implements the onseekbarchange
+     */
     private class seekBarChanger implements SeekBar.OnSeekBarChangeListener {
 
+        /**
+         * method who change the associate text for each seekbar value to watch the progress of the bar
+         *
+         * @param seekBar - the changed seekbar
+         * @param progress - actual progress of the seekbar
+         * @param fromUser - made by user
+         */
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 
@@ -122,8 +134,22 @@ public class Vue extends AppCompatActivity {
     }
 
 
+    /**
+     * class who implements ontouchlistener
+     */
     private class clickSurface implements SurfaceView.OnTouchListener {
 
+        /**
+         * make different action depend of wish thing is pressed,
+         * exit = exit the apllication
+         * generate = generade a random particle
+         * initialize = reset all compent
+         *
+         * @param v - the view (surfaceview)
+         * @param m - the movement of the user
+         *
+         * @return true - is touched
+         */
         @Override
         public boolean onTouch(View v, MotionEvent m) {
             if (m.getAction() == MotionEvent.ACTION_DOWN) {
@@ -131,7 +157,7 @@ public class Vue extends AppCompatActivity {
                     Log.d("ASD", "generate");
                     ajouterparticle(Math.floor(Math.random() * pane.getWidth()), Math.floor(Math.random() * pane.getHeight()),
                             Math.floor(Math.random() * seekBarAngle.getMax()), Math.floor(Math.random() * seekBarSpeed.getMax()),
-                            Math.floor(Math.random() * (seekBarRadius.getMax() - Vue.MIN_RADIUS) + Vue.MIN_RADIUS));
+                            Math.floor(Math.random() * (seekBarRadius.getMax() - Particle.MIN_RADIUS_VALUE) + 4));
                 } else if (v.getId() == initialize.getId()) {
                     reset();
                 } else if (v.getId() == exit.getId()) {
@@ -145,6 +171,16 @@ public class Vue extends AppCompatActivity {
         }
     }
 
+    /**
+     * Used to generate a particle with given parameters, if parameters are invalid it will create a particle
+     * with the default values from the class
+     *
+     * @param x - x dimension
+     * @param y - y dimension
+     * @param angle - angle of the movement
+     * @param speed -  speed of the movement
+     * @param radius -  radius of the particle
+     */
     private void ajouterparticle(double x, double y, double angle, double speed, double radius)
     {
         if(start == false){
@@ -165,16 +201,15 @@ public class Vue extends AppCompatActivity {
         if(valid){
             objectList.add(part);
             textnbParticle.setText(String.valueOf(Integer.parseInt(textnbParticle.getText().toString()) + 1));
-            dessin();
+            draw();
         }
     }
 
-    //TODO dessine les formes mais glitch sur bouton generate (genere 2 cercle)
-    private void dessin() {
-        canvas = null;
-        surface = pane.getHolder();
-        paint = new Paint();
-        paint.setStyle(Paint.Style.FILL);
+
+    /**
+     * Draw a particle from the array of particle in the surfaceview
+     */
+    private void draw() {
         canvas = surface.lockCanvas(null);
         synchronized (surface) {
             canvas.drawColor(Color.BLACK);
@@ -186,6 +221,11 @@ public class Vue extends AppCompatActivity {
         surface.unlockCanvasAndPost(canvas);
     }
 
+    /**
+     * method who give the associate code of color for a specifiate color
+     *
+     * @return int - the code of the color
+     */
     private int getColor() {
         int color = Color.WHITE;
         switch(spnColor.getSelectedItem().toString()){
@@ -209,6 +249,10 @@ public class Vue extends AppCompatActivity {
     }
 
 
+
+    /**
+     * Used to reset the graphic components of the application and empty the game pane
+     */
     private void reset() {
         spnColor.setSelection(0);
         textnbParticle.setText(String.valueOf(0));
@@ -225,7 +269,8 @@ public class Vue extends AppCompatActivity {
         start = false;
     }
 
-        @Override
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_vue, menu);
@@ -248,39 +293,35 @@ public class Vue extends AppCompatActivity {
     }
 
 
-
+    /**
+     * Service running the movement for the game.
+     */
     private class MovementService implements Runnable {
-        private final static long SLEEP_TIME = 2;
+        private final static long SLEEP_TIME = 25;
         boolean running;
 
         @Override
         public void run() {
             running = true;
             while(running){
-                Particle currentParticle;
                 ArrayList<Particle> currentParticles = new ArrayList<>();
                 currentParticles.addAll(objectList);
 
                 for(Particle cp : currentParticles){
                     if(running){
-                        currentParticle = cp;
-                        double oldX = currentParticle.getX();
-                        double oldY = currentParticle.getY();
-                        currentParticle.move(SLEEP_TIME);
-                        if(currentParticle.getX() >= pane.getWidth()){
-                            currentParticle.setX(pane.getWidth()-currentParticle.getRadius());
-                        }else if(currentParticle.getX() < 0){
-                            currentParticle.setX(currentParticle.getRadius());
-                        }else if(currentParticle.getY() >= pane.getHeight()){
-                            currentParticle.setY(pane.getHeight()-currentParticle.getRadius());
-                        }else if(currentParticle.getY() < 0){
-                            currentParticle.setY(currentParticle.getRadius());
+                        cp.move();
+                        if(cp.getX() >= pane.getWidth()){
+                            cp.setX(pane.getWidth()-cp.getRadius());
+                        }else if(cp.getX() < 0){
+                            cp.setX(cp.getRadius());
+                        }else if(cp.getY() >= pane.getHeight()){
+                            cp.setY(pane.getHeight()-cp.getRadius());
+                        }else if(cp.getY() < 0){
+                            cp.setY(cp.getRadius());
                         }
+                        collideParticle(cp);
 
-                        dessin();
-
-                        if(collideParticle(currentParticle)){
-                        }
+                        draw();
                     }
                 }
 
@@ -293,31 +334,30 @@ public class Vue extends AppCompatActivity {
         }
     }
 
-    public boolean collideParticle(Particle p){
-        Particle currentParticle;
+
+    /**
+     * Method that looks for collision between a particle and the rest of them on the game board
+     * or the walls
+     * @param p Particle to check for collision
+     * @return True if it has collided with something, wall or particle
+     */
+    public void collideParticle(Particle p){
         Movement movement = p.getMovement();
-        boolean returnValue = false;
         // Circle colliding wall
         // Right wall collision
         if(p.getX() + p.getRadius() >= pane.getWidth() || p.getX() - p.getRadius() < 0){
             movement.setXMovement(-movement.getXMovement());
-            returnValue = true;
         } else if(p.getY() - p.getRadius() < 0 || p.getY() + p.getRadius() >= pane.getHeight()){
             movement.setYMovement(-movement.getYMovement());
-            returnValue = true;
         }
-
         // Circles colliding other circles
         for(Particle cp : objectList){
-            currentParticle = cp;
-            if(!currentParticle.equals(p)){
-                if(p.isColliding(currentParticle)){
-                    p.collide(currentParticle);
+            if(!cp.equals(p)){
+                if(p.isColliding(cp)){
+                    p.collide(cp);
                 }
             }
         }
-
-        return returnValue;
     }
 }
 

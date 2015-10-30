@@ -1,7 +1,7 @@
 package sfad.tp3android;
 
 /**
- *
+ *  class EXECPTION for the class movement
  */
 public class MovementException extends Exception {
 

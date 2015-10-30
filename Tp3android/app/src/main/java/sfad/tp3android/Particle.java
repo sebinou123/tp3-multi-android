@@ -3,13 +3,14 @@ package sfad.tp3android;
 import android.graphics.Color;
 
 /**
- *
+ * Class particle, with different parameter (speed,radius,speed) for the application  collision of balls
  */
 public class Particle{
     /**
      * Constant variables representing default values, min values and max values
      * of most the Particle's attributes
      */
+    public static final double RADIUS_INCREASE_RATIO = 3;
     public static final double DEFAULT_SPEED = 0;
     public static final double DEFAULT_ANGLE = 0;
     public static final double DEFAULT_RADIUS = 4;
@@ -39,14 +40,14 @@ public class Particle{
         this.setSpeed(Particle.DEFAULT_SPEED);
         this.setAngle(Particle.DEFAULT_ANGLE);
         this.setMovement(new Movement(Particle.DEFAULT_SPEED));
-        this.setRadius(Particle.DEFAULT_RADIUS);
+        this.setRadius(Particle.DEFAULT_RADIUS*RADIUS_INCREASE_RATIO);
         this.setColor(Color.WHITE);
     }
 
     public Particle(double x, double y, double a, double s, double r, int color){
         this.x = x;
         this.y = y;
-        this.radius = r;
+        this.radius = r*RADIUS_INCREASE_RATIO;
         this.speed = s;
         this.angle = a;
         this.movement = new Movement(Math.cos(Math.toRadians(angle)), Math.sin(Math.toRadians(angle)), s);
@@ -55,11 +56,10 @@ public class Particle{
 
     /**
      * Moves the particle given the timeframe the game is running on
-     * @param rate Time frame the game is running on
      */
-    public void move(double rate){
-        this.x += this.movement.getXMovement() / rate;
-        this.y += this.movement.getYMovement() / rate;
+    public void move(){
+        this.x += this.movement.getXMovement();
+        this.y += this.movement.getYMovement();
     }
 
     /**
@@ -91,9 +91,9 @@ public class Particle{
      * @param p Particle that is colliding
      */
     public void collide(Particle p){
-        // NOTE: La collision ne prends pas en comtpe la masse des deux balles, nous avons essayÃ©
-        // mais nos connaissances en mathÃ©matiques et physique sont limitÃ©es et nous ne trouvions
-        // pas une bonne faÃ§on de le faire, la comprendre et l'appliquer. @alexisd
+        // NOTE: La collision ne prends pas en comtpe la masse des deux balles, nous avons essayÃƒÂ©
+        // mais nos connaissances en mathÃƒÂ©matiques et physique sont limitÃƒÂ©es et nous ne trouvions
+        // pas une bonne faÃƒÂ§on de le faire, la comprendre et l'appliquer. @alexisd
         double tempx = p.getMovement().getXMovement();
         double tempy = p.getMovement().getYMovement();
         p.getMovement().setXMovement(this.getMovement().getXMovement());

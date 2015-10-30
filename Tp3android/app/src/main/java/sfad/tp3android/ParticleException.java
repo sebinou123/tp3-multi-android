@@ -1,7 +1,7 @@
 package sfad.tp3android;
 
 /**
- *
+ * Class Exception for the class Particle
  */
 public class ParticleException extends Exception{
 

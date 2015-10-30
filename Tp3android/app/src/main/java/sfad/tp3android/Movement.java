@@ -1,7 +1,7 @@
 package sfad.tp3android;
 
 /**
- *
+ *  Class movement who work with the movement change for the particle
  */
 public class Movement {
     /**

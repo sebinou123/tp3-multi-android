@@ -71,7 +71,7 @@ public class ParticleTest{
      @Test
     public void testValidateX() {
        System.out.println("validate X");
-       assertTrue(p1.validateX(p1.getX()));
+       assertFalse(p1.validateX(p1.getX()));
        assertTrue(p2.validateX(p2.getX()));
        assertFalse(p1.validateX(-5000.0));
       
@@ -83,7 +83,7 @@ public class ParticleTest{
        @Test
     public void testValidateY() {
        System.out.println("validate Y");
-       assertTrue(p3.validateY(p3.getY()));
+       assertFalse(p3.validateY(p3.getY()));
        assertTrue(p4.validateY(p4.getY()));
        assertFalse(p3.validateY(-5000.0));
     }
@@ -218,24 +218,19 @@ public class ParticleTest{
         
         double xP1 = p1.getX();
         double xP2 = p2.getX();
-        double xP3 = p3.getX();
         double yP1 = p1.getY();
         double yP2 = p2.getY();
-        double yP3 = p3.getY();
-        
-        //with positif value
-        p1.move(15);
-        p2.move(10);
-        
-        //with negative value
-        p3.move(-7);
 
-        assertTrue( p1.getX() == (xP1 + p1.getMovement().getXMovement()/15));
-        assertTrue( p1.getY() == (yP1 + p1.getMovement().getYMovement()/15));
-        assertTrue( p2.getX() == (xP2 + p2.getMovement().getXMovement()/10));
-        assertTrue( p2.getY() == (yP2 + p2.getMovement().getYMovement()/10));
-        assertTrue( p3.getX() == (xP3 + p3.getMovement().getXMovement()/-7));
-        assertTrue( p3.getY() == (yP3 + p3.getMovement().getYMovement()/-7));
+
+        p1.move();
+        p2.move();
+        
+
+
+         assertTrue(p1.getX() == xP1 + p1.getMovement().getXMovement());
+         assertTrue(p1.getY() == yP1 + p1.getMovement().getYMovement());
+         assertTrue( p2.getX() == xP2 + p2.getMovement().getXMovement());
+         assertTrue( p2.getY() == yP2 + p2.getMovement().getYMovement());
     }
     
     /**
